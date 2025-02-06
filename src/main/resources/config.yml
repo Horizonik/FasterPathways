@@ -18,3 +18,7 @@ messages:
 # Use Bukkit material names (see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
 speedBlocks:
   - DIRT_PATH
+
+# Worlds where the speed effect is disabled, you can specify "disabledWorlds: []" to allow it on all worlds
+disabledWorlds:
+  - example_world

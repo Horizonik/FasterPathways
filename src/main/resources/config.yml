@@ -1,8 +1,20 @@
-# Set this to the level of the speed effect you'd like to be applied when a player steps on a dirt_path. Default is 2.
-SpeedEffectLevel: 2
+# FasterPathways Configuration
 
-# The amount of time (in seconds) that the speed effect will be applied after stepping on a dirt path. Default is 2.
-SpeedEffectDuration: 2
+# Speed effect settings
+speed:
+  # Set this to the level of the speed effect you'd like to be applied when a player steps on a dirt_path. Default is 2.
+  level: 3
+  # The amount of time (in seconds) that the speed effect will be applied after stepping on a dirt path. Default is 1.
+  duration: 1
 
-# The message that will be displayed in a player's hot bar while walking on a dirt path block
-actionBarMessage: "Faster than Light Mode"
+# Messages
+messages:
+  # The message that will be displayed in a player's hot bar while walking on a dirt path block (supports color codes with &)
+  actionBar: "&eTravel blocks are causing you to move faster!"
+  # Whether to show the action bar message
+  showActionBar: true
+
+# List of blocks that will give speed effect
+# Use Bukkit material names (see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
+speedBlocks:
+  - DIRT_PATH

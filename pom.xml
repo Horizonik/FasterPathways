@@ -6,14 +6,16 @@
 
     <groupId>gemesil</groupId>
     <artifactId>FasterPathways</artifactId>
-    <version>1.0</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
 
     <name>FasterPathways</name>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <build>
@@ -39,7 +41,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>D:\code\@minecraft_plugins\FasterPathways\FasterPathways.jar</outputFile>
+                            <outputFile>D:\@code\minecraft_plugins\FasterPathways\jars\1.21.4-1.2\FasterPathways.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
@@ -68,7 +70,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.2-R0.1-SNAPSHOT</version>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

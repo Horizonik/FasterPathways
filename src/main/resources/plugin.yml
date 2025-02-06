@@ -1,5 +1,5 @@
 name: FasterPathways
 version: '${project.version}'
 main: gemesil.fasterpathways.FasterPathways
-api-version: 1.19
+api-version: 1.21
 description: Gain a speed effect when walking on a dirt path block

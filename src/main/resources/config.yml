@@ -1,24 +1,31 @@
-# FasterPathways Configuration
-
-# Speed effect settings
-speed:
-  # Set this to the level of the speed effect you'd like to be applied when a player steps on a dirt_path. Default is 2.
-  level: 3
-  # The amount of time (in seconds) that the speed effect will be applied after stepping on a dirt path. Default is 1.
-  duration: 1
-
-# Messages
 messages:
-  # The message that will be displayed in a player's hot bar while walking on a dirt path block (supports color codes with &)
-  actionBar: "&eTravel blocks are causing you to move faster!"
   # Whether to show the action bar message
   showActionBar: true
 
-# List of blocks that will give speed effect
-# Use Bukkit material names (see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
-speedBlocks:
-  - DIRT_PATH
+  # The message that will be displayed in a player's hot bar while walking on a dirt path block (supports color codes with &)
+  actionBar: "&eYou're moving faster!"
 
 # Worlds where the speed effect is disabled, you can specify "disabledWorlds: []" to allow it on all worlds
-disabledWorlds:
-  - example_world
+disabledWorlds: []
+
+# Preferred per-block configuration (takes priority if present)
+# multiplier: 0.20 -> +20% movement speed
+# Use Bukkit material names to specify blocks (see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
+blocks:
+  - material: DIRT_PATH
+    multiplier: 0.25
+#  Additional examples:
+#  - material: STONE_BRICKS
+#    multiplier: 0.10
+#  - material: PACKED_ICE
+#    multiplier: 0.35
+
+# -------------------------------------------------------------
+# **Legacy fallback**
+# if "blocks" is empty/missing: applies the same multiplier to all listed blocks.
+# -------------------------------------------------------------
+speed:
+  # How fast do you want your players to be when stepping on the speed blocks
+  multiplier: 0.20
+speedBlocks:
+  - DIRT_PATH

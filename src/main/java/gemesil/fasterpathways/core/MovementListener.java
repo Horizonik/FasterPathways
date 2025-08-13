@@ -54,7 +54,7 @@ public final class MovementListener implements Listener {
 
         final Optional<BlockBoost> boost = resolveBoostFor(player);
         if (boost.isPresent()) {
-            final double multiplier = boost.get().multiplier;
+            final double multiplier = boost.get().multiplier();
             boostService.ensureAttribute(player, multiplier);
 
             if (config.isShowActionBar()) {

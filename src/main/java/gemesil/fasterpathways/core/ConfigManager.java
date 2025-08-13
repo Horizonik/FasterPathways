@@ -20,22 +20,17 @@ public final class ConfigManager {
      * Immutable per-block configuration entry.
      * multiplier: 0.20 means +20% movement speed.
      */
-    public static final class BlockBoost {
-        public final Material material;
-        public final double multiplier;
-
+    public record BlockBoost(Material material, double multiplier) {
         public BlockBoost(final Material material, final double multiplier) {
             this.material = material;
             this.multiplier = Math.max(0.0, multiplier);
         }
     }
 
-    private final Logger logger;
     private final Set<String> disabledWorldNames = new HashSet<>();
     private final Map<Material, BlockBoost> boostsByMaterial = new EnumMap<>(Material.class);
     private final boolean showActionBar;
     private final String actionBarMessage;
-    private final double defaultMultiplier;
 
     /**
      * Constructs and loads configuration.
@@ -45,7 +40,6 @@ public final class ConfigManager {
      * @param server Bukkit server (used to warn on missing worlds)
      */
     public ConfigManager(final FileConfiguration cfg, final Logger logger, final Server server) {
-        this.logger = logger;
 
         // Messages
         this.showActionBar = cfg.getBoolean("messages.showActionBar", true);
@@ -54,7 +48,7 @@ public final class ConfigManager {
         );
 
         // Default multiplier (legacy/global fallback)
-        this.defaultMultiplier = Math.max(0.0, cfg.getDouble("speed.multiplier", 0.20));
+        double defaultMultiplier = Math.max(0.0, cfg.getDouble("speed.multiplier", 0.20));
 
         // Disabled worlds
         this.disabledWorldNames.addAll(cfg.getStringList("disabledWorlds"));
@@ -67,14 +61,18 @@ public final class ConfigManager {
 
         // Preferred per-block format
         if (cfg.isList("blocks")) {
-            for (Map<?, ?> rawEntry : cfg.getMapList("blocks")) {
-                if (!(rawEntry instanceof Map<?, ?> entry)) continue;
-                String materialName = String.valueOf(entry.getOrDefault("material", "")).toUpperCase(Locale.ROOT);
+            for (Object rawEntry : cfg.getMapList("blocks")) {
+                if (!(rawEntry instanceof Map)) continue;
+
+                @SuppressWarnings("unchecked") final Map<String, Object> entry = (Map<String, Object>) rawEntry;
+
+                final String materialName = String.valueOf(entry.getOrDefault("material", ""))
+                        .toUpperCase(Locale.ROOT);
                 if (materialName.isBlank()) continue;
 
                 try {
-                    Material material = Material.valueOf(materialName);
-                    double multiplier = toDouble(entry.get("multiplier"), defaultMultiplier);
+                    final Material material = Material.valueOf(materialName);
+                    final double multiplier = toDouble(entry.get("multiplier"), defaultMultiplier);
                     boostsByMaterial.put(material, new BlockBoost(material, multiplier));
                 } catch (IllegalArgumentException ex) {
                     logger.log(Level.WARNING, "FasterPathways | Invalid material in blocks: " + materialName);
@@ -85,7 +83,7 @@ public final class ConfigManager {
         // Legacy fallback if no per-block entries present
         if (boostsByMaterial.isEmpty()) {
             List<String> legacyList = cfg.getStringList("speedBlocks");
-            if (legacyList == null || legacyList.isEmpty()) {
+            if (legacyList.isEmpty()) {
                 legacyList = Collections.singletonList("DIRT_PATH");
                 logger.warning("FasterPathways | No blocks configured; adding DIRT_PATH as default");
             }

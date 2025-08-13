@@ -35,7 +35,7 @@ public final class FasterPathways extends JavaPlugin {
     public void onDisable() {
         // Ensure no one remains boosted after disable/reload
         for (Player onlinePlayer : getServer().getOnlinePlayers()) {
-            if (onlinePlayer.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED) != null) {
+            if (onlinePlayer.getAttribute(Attribute.MOVEMENT_SPEED) != null) {
                 boostService.clearAttributeModifier(onlinePlayer);
             }
         }

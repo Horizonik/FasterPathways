@@ -1,6 +1,6 @@
 [![Maven Package](https://github.com/Gemesil/FasterPathways/actions/workflows/maven-publish.yml/badge.svg)](https://github.com/Gemesil/FasterPathways/actions/workflows/maven-publish.yml)
 ![Java](https://img.shields.io/badge/dynamic/xml?color=orange&label=Java&query=%2F%2F%2A%5Blocal-name%28%29%3D%27java.version%27%5D&url=https%3A%2F%2Fraw.githubusercontent.com%2FHorizonik%2FFasterPathways%2Fmain%2Fpom.xml)
-![Spigot](https://img.shields.io/badge/Spigot-1.21.4-yellow)
+![Spigot](https://img.shields.io/badge/Spigot-1.21.8-yellow)
 
 <p align="center">
   <img src="icons/icon.png" width="200">

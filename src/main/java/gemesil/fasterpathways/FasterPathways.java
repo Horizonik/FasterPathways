@@ -27,8 +27,6 @@ public final class FasterPathways extends JavaPlugin {
                 new MovementListener(configManager, boostService),
                 this
         );
-
-        getLogger().info("FasterPathways | Enabled (attribute-only)");
     }
 
     @Override
@@ -36,10 +34,9 @@ public final class FasterPathways extends JavaPlugin {
         // Ensure no one remains boosted after disable/reload
         for (Player onlinePlayer : getServer().getOnlinePlayers()) {
             if (onlinePlayer.getAttribute(Attribute.MOVEMENT_SPEED) != null) {
-                boostService.clearAttributeModifier(onlinePlayer);
+                boostService.removeSpeedMultiplier(onlinePlayer);
             }
         }
-        boostService.clearAll();
     }
 
     /**

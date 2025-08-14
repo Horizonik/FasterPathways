@@ -6,85 +6,108 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Applies and clears the movement speed attribute modifier in a stable, idempotent way.
- * Uses a deterministic UUID per player so re-application does not stack.
+ * Manages a player's movement-speed attribute modifier (Spigot 1.21.8).
+ * Uses a deterministic UUID per player to avoid duplicates and ensure safe replace/remove.
  */
 public final class BoostService {
 
-    private static final String MODIFIER_NAME = "FasterPathways";
-    private final Map<UUID, Double> appliedMultiplierByPlayer = new HashMap<>();
+    private static final String SPEED_MODIFIER_NAME_PREFIX = "fasterpathways.speed:";
+    private static final String LEGACY_NAME = "FasterPathways"; // cleanup from older builds
 
     /**
-     * Ensures the player has the specified multiplier applied.
-     * If a different value is already present, it will be replaced.
-     *
-     * @param player     target player
-     * @param multiplier +0.20 for +20% speed
+     * Apply or update a +X% speed modifier. No-ops if the same value is already applied.
      */
-    public void ensureAttribute(final Player player, final double multiplier) {
-        final UUID playerId = player.getUniqueId(); // this is fine on your API
-        final double clamped = Math.max(0.0, multiplier);
+    public void applySpeedMultiplier(final Player player, final double multiplier) {
+        final AttributeInstance attr = player.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (attr == null) return;
 
-        final Double current = appliedMultiplierByPlayer.get(playerId);
-        if (current != null && Math.abs(current - clamped) < 1e-9) return;
+        final double amount = Math.max(0.0, multiplier);
+        final UUID targetId = stableModifierUuid(player);
+        final String targetName = speedModifierNameFor(player);
 
-        clearAttributeModifier(player);
-        addAttributeModifier(player, clamped);
-    }
+        // Check if the correct modifier is already present (same UUID + amount).
+        final AttributeModifier current = findByUuid(attr, targetId);
+        if (current != null
+                && current.getOperation() == AttributeModifier.Operation.ADD_SCALAR
+                && Math.abs(current.getAmount() - amount) < 1e-9) {
+            return; // already correct
+        }
 
-    /**
-     * Removes the plugin's attribute modifier from the player if present.
-     * Avoids deprecated AttributeModifier#getUniqueId() by removing by name.
-     *
-     * @param player target player
-     */
-    public void clearAttributeModifier(final Player player) {
-        final AttributeInstance instance = player.getAttribute(Attribute.MOVEMENT_SPEED);
-        if (instance == null) return;
+        // Remove any prior copies that match our UUID or known names, then add the new value.
+        removeSpeedModifiers(attr, targetId, targetName);
 
-        // Remove any modifier we previously added by NAME (non-deprecated path)
-        instance.getModifiers().stream()
-                .filter(mod -> MODIFIER_NAME.equals(mod.getName()))
-                .toList()
-                .forEach(instance::removeModifier);
-
-        appliedMultiplierByPlayer.remove(player.getUniqueId());
-    }
-
-    /**
-     * Clears internal bookkeeping. Should be called on plugin disable.
-     */
-    public void clearAll() {
-        appliedMultiplierByPlayer.clear();
-    }
-
-    private void addAttributeModifier(final Player player, final double multiplier) {
-        final AttributeInstance instance = player.getAttribute(Attribute.MOVEMENT_SPEED);
-        if (instance == null) return;
-
-        final UUID modifierId = stableModifierUuidFor(player.getUniqueId());
-
-        final AttributeModifier modifier = new AttributeModifier(
-                modifierId,
-                MODIFIER_NAME,
-                multiplier,
+        // Spigot exposes only the UUID constructor at runtime
+        final AttributeModifier updated = new AttributeModifier(
+                targetId,
+                targetName,
+                amount,
                 AttributeModifier.Operation.ADD_SCALAR
         );
-
-        instance.addModifier(modifier);
-        appliedMultiplierByPlayer.put(player.getUniqueId(), multiplier);
+        attr.addModifier(updated);
     }
 
     /**
-     * Deterministic UUID for this plugin's modifier per player.
+     * Remove the speed modifier for this player (if present).
      */
-    private static UUID stableModifierUuidFor(final UUID playerUuid) {
-        final String seed = "fasterpathways-" + playerUuid;
+    public void removeSpeedMultiplier(final Player player) {
+        final AttributeInstance attr = player.getAttribute(Attribute.MOVEMENT_SPEED);
+        if (attr == null) return;
+
+        final UUID targetId = stableModifierUuid(player);
+        final String targetName = speedModifierNameFor(player);
+        removeSpeedModifiers(attr, targetId, targetName);
+    }
+
+    // ---------- helpers ----------
+
+    private static String speedModifierNameFor(final Player player) {
+        return SPEED_MODIFIER_NAME_PREFIX + player.getUniqueId();
+    }
+
+    private static UUID stableModifierUuid(final Player player) {
+        final String seed = "fasterpathways:" + player.getUniqueId();
         return UUID.nameUUIDFromBytes(seed.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Find an existing modifier by UUID (uses deprecated getter, isolated here).
+     */
+    private static AttributeModifier findByUuid(final AttributeInstance attr, final UUID uuid) {
+        for (AttributeModifier m : attr.getModifiers()) {
+            if (uuidEquals(m, uuid)) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Remove any modifier that matches our UUID or our known names (current + legacy).
+     */
+    private static void removeSpeedModifiers(final AttributeInstance attr, final UUID uuid, final String name) {
+        final List<AttributeModifier> toRemove = new ArrayList<>();
+        for (AttributeModifier m : attr.getModifiers()) {
+            final boolean sameUuid = uuidEquals(m, uuid);
+            final boolean sameName = Objects.equals(m.getName(), name) || Objects.equals(m.getName(), LEGACY_NAME);
+            if (sameUuid || sameName) {
+                toRemove.add(m);
+            }
+        }
+        for (AttributeModifier m : toRemove) {
+            attr.removeModifier(m);
+        }
+    }
+
+    /**
+     * Compare via deprecated getter; isolated so the rest of the code stays modern.
+     */
+    private static boolean uuidEquals(final AttributeModifier modifier, final UUID expected) {
+        return modifier.getUniqueId().equals(expected);
     }
 }

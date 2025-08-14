@@ -47,15 +47,12 @@ public final class ConfigManager {
                 '&', cfg.getString("messages.actionBar", "&eYou're moving faster!")
         );
 
-        // Default multiplier (legacy/global fallback)
-        double defaultMultiplier = Math.max(0.0, cfg.getDouble("speed.multiplier", 0.20));
-
         // Disabled worlds
         this.disabledWorldNames.addAll(cfg.getStringList("disabledWorlds"));
         for (String worldName : disabledWorldNames) {
             World world = server.getWorld(worldName);
             if (world == null) {
-                logger.warning("FasterPathways | World not found: " + worldName);
+                logger.warning("World not found: " + worldName);
             }
         }
 
@@ -66,33 +63,17 @@ public final class ConfigManager {
 
                 @SuppressWarnings("unchecked") final Map<String, Object> entry = (Map<String, Object>) rawEntry;
 
-                final String materialName = String.valueOf(entry.getOrDefault("material", ""))
-                        .toUpperCase(Locale.ROOT);
+                final String materialName = String.valueOf(entry.getOrDefault("material", "")).toUpperCase(Locale.ROOT);
                 if (materialName.isBlank()) continue;
 
                 try {
                     final Material material = Material.valueOf(materialName);
-                    final double multiplier = toDouble(entry.get("multiplier"), defaultMultiplier);
+                    final double multiplier = toDouble(entry.get("multiplier"), 0);
+                    if (multiplier == 0) continue;
+
                     boostsByMaterial.put(material, new BlockBoost(material, multiplier));
                 } catch (IllegalArgumentException ex) {
-                    logger.log(Level.WARNING, "FasterPathways | Invalid material in blocks: " + materialName);
-                }
-            }
-        }
-
-        // Legacy fallback if no per-block entries present
-        if (boostsByMaterial.isEmpty()) {
-            List<String> legacyList = cfg.getStringList("speedBlocks");
-            if (legacyList.isEmpty()) {
-                legacyList = Collections.singletonList("DIRT_PATH");
-                logger.warning("FasterPathways | No blocks configured; adding DIRT_PATH as default");
-            }
-            for (String name : legacyList) {
-                try {
-                    Material material = Material.valueOf(name.toUpperCase(Locale.ROOT));
-                    boostsByMaterial.put(material, new BlockBoost(material, defaultMultiplier));
-                } catch (IllegalArgumentException ex) {
-                    logger.log(Level.WARNING, "FasterPathways | Invalid material in speedBlocks: " + name);
+                    logger.log(Level.WARNING, "Invalid material in blocks: " + materialName);
                 }
             }
         }

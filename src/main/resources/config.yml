@@ -1,31 +1,25 @@
-messages:
-  # Whether to show the action bar message
-  showActionBar: true
-
-  # The message that will be displayed in a player's hot bar while walking on a dirt path block (supports color codes with &)
-  actionBar: "&eYou're moving faster!"
-
-# Worlds where the speed effect is disabled, you can specify "disabledWorlds: []" to allow it on all worlds
-disabledWorlds: []
-
-# Preferred per-block configuration (takes priority if present)
-# multiplier: 0.20 -> +20% movement speed
-# Use Bukkit material names to specify blocks (see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
+# ──── 🪨 Block Boost Settings ─────────────────────────────────────────────────────────────
+# Preferred per-block configuration
+# Use Bukkit material names: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
 blocks:
   - material: DIRT_PATH
-    multiplier: 0.25
-#  Additional examples:
-#  - material: STONE_BRICKS
-#    multiplier: 0.10
-#  - material: PACKED_ICE
-#    multiplier: 0.35
+    multiplier: 0.65 # 0.65 → +65% movement speed
+  # Additional example:
+  # - material: PACKED_ICE
+  #   multiplier: 1.0
 
-# -------------------------------------------------------------
-# **Legacy fallback**
-# if "blocks" is empty/missing: applies the same multiplier to all listed blocks.
-# -------------------------------------------------------------
-speed:
-  # How fast do you want your players to be when stepping on the speed blocks
-  multiplier: 0.20
-speedBlocks:
-  - DIRT_PATH
+
+# ──── 🌍 Disabled Worlds ──────────────────────────────────────────────────────────────────
+# List worlds where the speed boost is disabled. Use [] to enable on all worlds. Or remove the [] and add your world names below.
+disabledWorlds: []
+#  - world_example
+
+
+# ──── 💬 Messages (Action Bar) ────────────────────────────────────────────────────────────
+# Text shown to the player while walking on boosted blocks. '&' color codes supported.
+messages:
+  # Whether to show the action bar message
+  showActionBar: false
+
+  # Text displayed while on a boosted block
+  actionBar: "&eYou're moving faster!"

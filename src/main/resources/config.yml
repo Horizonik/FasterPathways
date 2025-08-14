@@ -1,24 +1,25 @@
-# FasterPathways Configuration
+# ──── 🪨 Block Boost Settings ─────────────────────────────────────────────────────────────
+# Preferred per-block configuration
+# Use Bukkit material names: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+blocks:
+  - material: DIRT_PATH
+    multiplier: 0.65 # 0.65 → +65% movement speed
+  # Additional example:
+  # - material: PACKED_ICE
+  #   multiplier: 1.0
 
-# Speed effect settings
-speed:
-  # Set this to the level of the speed effect you'd like to be applied when a player steps on a dirt_path. Default is 2.
-  level: 3
-  # The amount of time (in seconds) that the speed effect will be applied after stepping on a dirt path. Default is 1.
-  duration: 1
 
-# Messages
+# ──── 🌍 Disabled Worlds ──────────────────────────────────────────────────────────────────
+# List worlds where the speed boost is disabled. Use [] to enable on all worlds. Or remove the [] and add your world names below.
+disabledWorlds: []
+#  - world_example
+
+
+# ──── 💬 Messages (Action Bar) ────────────────────────────────────────────────────────────
+# Text shown to the player while walking on boosted blocks. '&' color codes supported.
 messages:
-  # The message that will be displayed in a player's hot bar while walking on a dirt path block (supports color codes with &)
-  actionBar: "&eTravel blocks are causing you to move faster!"
   # Whether to show the action bar message
-  showActionBar: true
+  showActionBar: false
 
-# List of blocks that will give speed effect
-# Use Bukkit material names (see: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html)
-speedBlocks:
-  - DIRT_PATH
-
-# Worlds where the speed effect is disabled, you can specify "disabledWorlds: []" to allow it on all worlds
-disabledWorlds:
-  - example_world
+  # Text displayed while on a boosted block
+  actionBar: "&eYou're moving faster!"
